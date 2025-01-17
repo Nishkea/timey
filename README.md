@@ -33,3 +33,7 @@ sections = {
     },
 }
 ```
+
+### Roadmap / bugfixes
+[ ] - Starting two timers breaks lualine atm
+[ ] - Integrated popup instead of builtin
