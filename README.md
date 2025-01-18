@@ -1,7 +1,7 @@
 # ⏱️ Timey
 Simple timer with added tag functionality.
 
-
+This timer is in active development, use at your own risk! :)
 
 https://github.com/user-attachments/assets/ab52b57f-3475-4fad-a56a-db6f10ec4e31
 
