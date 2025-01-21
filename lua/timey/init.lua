@@ -68,7 +68,7 @@ function M.delete_timer(tag)
     print('Deleted timer for tag:', tag)
 end
 
-function M.get_latest_running_timer()
+function M.get_timers()
     load_timers()
     local running_timers = {}
     for tag, timer in pairs(timers) do
@@ -88,7 +88,7 @@ function M.get_latest_running_timer()
 end
 
 function M.current()
-    return M.get_latest_running_timer()
+    return M.get_timers()
 end
 
 function M.show_timers_popup()
