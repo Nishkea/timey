@@ -68,25 +68,27 @@ function M.delete_timer(tag)
     print('Deleted timer for tag:', tag)
 end
 
-function M.get_latest_running_timer()
+function M.get_timers()
     load_timers()
-    local latest_timer = nil
+    local running_timers = {}
     for tag, timer in pairs(timers) do
         if timer.status == 'running' then
-            if not latest_timer or timer.start > latest_timer.start then
-                latest_timer = { tag = tag, elapsed = os.time() - timer.start + timer.elapsed }
-            end
+            table.insert(running_timers, { tag = tag, elapsed = os.time() - timer.start + timer.elapsed })
         end
     end
-    if latest_timer then
-        return string.format(' %s: %s', latest_timer.tag, format_time(latest_timer.elapsed))
+    if #running_timers > 0 then
+        local result = {}
+        for _, timer in ipairs(running_timers) do
+            table.insert(result, string.format(' %s: %s', timer.tag, format_time(timer.elapsed)))
+        end
+        return table.concat(result, '\n')
     else
         return ''
     end
 end
 
 function M.current()
-    return M.get_latest_running_timer()
+    return M.get_timers()
 end
 
 function M.show_timers_popup()
