@@ -81,7 +81,7 @@ function M.get_timers()
         for _, timer in ipairs(running_timers) do
             table.insert(result, string.format(' %s: %s', timer.tag, format_time(timer.elapsed)))
         end
-        return table.concat(result, '\n')
+        return table.concat(result, ' | ')
     else
         return ''
     end
