@@ -99,20 +99,27 @@ function M.show_timers_popup()
         if timer.status == 'running' then
             elapsed_time = os.time() - timer.start + timer.elapsed
         end
-        table.insert(items, {
-            text = string.format('%s: %s (%s)', tag, format_time(elapsed_time), timer.status),
-            tag = tag
-        })
+        table.insert(items, string.format('%s: %s (%s)', tag, format_time(elapsed_time), timer.status))
     end
     if #items == 0 then
-        print('No timers running')
-        return
+        table.insert(items, 'No timers running')
     end
-    vim.ui.select(items, {prompt = 'Timers:', format_item = function(item) return item.text end}, function(choice)
-        if choice then
-            print('Selected timer:', choice.tag)
-        end
-    end)
+
+    local content = table.concat(items, '\n')
+    local width = 50
+    local height = #items + 2
+
+    vim.api.nvim_open_win(vim.api.nvim_create_buf(false, true), true, {
+        relative = 'editor',
+        width = width,
+        height = height,
+        col = (vim.o.columns - width) // 2,
+        row = (vim.o.lines - height) // 2,
+        style = 'minimal',
+        border = 'rounded',
+    })
+
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, '\n'))
 end
 
 -- nvim commands prefix Timey
