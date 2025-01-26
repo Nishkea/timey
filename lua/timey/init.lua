@@ -113,8 +113,8 @@ function M.show_timers_popup()
         relative = 'editor',
         width = width,
         height = height,
-        col = (vim.o.columns - width) // 2,
-        row = (vim.o.lines - height) // 2,
+        col = (vim.o.columns - width),
+        row = (vim.o.lines - height),
         style = 'minimal',
         border = 'rounded',
     })
