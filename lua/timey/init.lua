@@ -93,7 +93,7 @@ end
 
 function M.show_timers_popup()
     load_timers()
-    local items = {}
+    local items = { '=== Timers Overview ===', '' } 
     for tag, timer in pairs(timers) do
         local elapsed_time = timer.elapsed
         if timer.status == 'running' then
@@ -101,7 +101,7 @@ function M.show_timers_popup()
         end
         table.insert(items, string.format('%s: %s (%s)', tag, format_time(elapsed_time), timer.status))
     end
-    if #items == 0 then
+    if #items == 2 then
         table.insert(items, 'No timers running')
     end
 
@@ -111,8 +111,8 @@ function M.show_timers_popup()
 
     vim.api.nvim_open_win(vim.api.nvim_create_buf(false, true), true, {
         relative = 'editor',
-        width = width,
-        height = height,
+        width = width + 4,
+        height = height + 2,
         col = (vim.o.columns - width),
         row = (vim.o.lines - height),
         style = 'minimal',
