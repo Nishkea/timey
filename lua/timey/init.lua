@@ -111,8 +111,8 @@ function M.show_timers_popup()
 
     vim.api.nvim_open_win(vim.api.nvim_create_buf(false, true), true, {
         relative = 'editor',
-        width = width + 4,
-        height = height + 2,
+        width = width,
+        height = height,
         col = (vim.o.columns - width),
         row = (vim.o.lines - height),
         style = 'minimal',
