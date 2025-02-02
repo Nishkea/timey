@@ -1,6 +1,6 @@
-local M = {}
 local timers = {}
 local timer_file = vim.fn.stdpath('data') .. '/timers.json'
+local M = {}
 
 local function save_timers()
     local file = io.open(timer_file, 'w')
@@ -93,7 +93,7 @@ end
 
 function M.show_timers_popup()
     load_timers()
-    local items = { '=== Timers Overview ===', '' } 
+    local items = { 'Timers Overview (beta)', '' } 
     for tag, timer in pairs(timers) do
         local elapsed_time = timer.elapsed
         if timer.status == 'running' then
@@ -102,24 +102,90 @@ function M.show_timers_popup()
         table.insert(items, string.format('%s: %s (%s)', tag, format_time(elapsed_time), timer.status))
     end
     if #items == 2 then
-        table.insert(items, 'No timers running')
+      table.insert(items, 'No timers running')
+    else 
+      table.insert(items, '')
+      table.insert(items, 'Press "d" to delete a timer')
+      table.insert(items, 'Press "t" to stop/resume a timer')
     end
 
     local content = table.concat(items, '\n')
     local width = 50
     local height = #items + 2
 
-    vim.api.nvim_open_win(vim.api.nvim_create_buf(false, true), true, {
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_open_win(buf, true, {
         relative = 'editor',
         width = width,
         height = height,
-        col = (vim.o.columns - width),
-        row = (vim.o.lines - height),
+        col = math.floor((vim.o.columns - width) / 2),
+        row = math.floor((vim.o.lines - height) / 2),
         style = 'minimal',
         border = 'rounded',
     })
 
-    vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(content, '\n'))
+    -- refresh buffer every second
+    vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'delete')
+    vim.api.nvim_buf_set_option(buf, 'buflisted', false)
+    vim.api.nvim_buf_set_option(buf, 'modifiable', true)
+
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(content, '\n'))
+    local line = vim.fn.line('.')
+    local tag = vim.fn.split(vim.fn.getline(line), ':')[1]
+
+    if #items >= 2 then
+      -- Local buffer keymaps
+      vim.api.nvim_buf_set_keymap(buf, 'n', 'd', ':lua require("timey-test").delete_timer_tag()<CR>', { noremap = true, silent = true })
+      vim.api.nvim_buf_set_keymap(buf, 'n', 't', ':lua require("timey-test").resume_timer_tag()<CR>', { noremap = true, silent = true })
+      vim.api.nvim_buf_set_keymap(buf, 'n', 'q', ':q<CR>', { noremap = true, silent = true })
+    end
+end
+
+function M.resume_timer_tag()
+    local line = vim.fn.line('.') - 3
+    local count = 0
+
+    for _ in pairs(timers) do count = count + 1 end
+    if count == 0 then
+        return
+    end
+
+    if line >= 0 and line <= (count - 1) then
+        local tag = vim.fn.split(vim.fn.getline(line + 3), ':')[1]
+        timers[tag] = nil
+
+        load_timers()
+        if not timers[tag] or timers[tag].status == 'stopped' then
+            M.start_timer(tag)
+        else
+          M.stop_timer(tag)
+        end
+
+        vim.api.nvim_win_close(0, true)
+        M.show_timers_popup()
+        return
+    end
+end
+
+function M.delete_timer_tag()
+    local line = vim.fn.line('.') - 3
+    local count = 0
+
+    for _ in pairs(timers) do count = count + 1 end
+    if count == 0 then
+        print('No timers to delete')
+        return
+    end
+
+    if line >= 0 and line <= (count - 1) then
+        local tag = vim.fn.split(vim.fn.getline(line + 3), ':')[1]
+        timers[tag] = nil
+        M.delete_timer(tag)
+
+        vim.api.nvim_win_close(0, true)
+        M.show_timers_popup()
+    end
 end
 
 -- nvim commands prefix Timey
