@@ -32,7 +32,7 @@ function M.start_timer(tag)
             return
         else
             -- Continue where it left off
-            timers[tag].start = os.time() - timers[tag].elapsed
+            timers[tag].start = os.time()
             timers[tag].status = 'running'
             print('Resumed timer for tag:', tag)
         end
@@ -51,7 +51,7 @@ function M.stop_timer(tag)
         return
     end
     local timer = timers[tag]
-    timer.elapsed = os.time() - timer.start
+    timer.elapsed = timer.elapsed + (os.time() - timer.start)
     timer.status = 'stopped'
     save_timers()
     print(string.format('Stopped timer for tag: %s, elapsed time: %s', tag, format_time(timer.elapsed)))
@@ -106,7 +106,7 @@ function M.show_timers_popup()
     else 
       table.insert(items, '')
       table.insert(items, 'Press "d" to delete a timer')
-      table.insert(items, 'Press "t" to stop/resume a timer')
+      table.insert(items, 'Press "t" to toggle a timer')
     end
 
     local content = table.concat(items, '\n')
